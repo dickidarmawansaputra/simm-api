@@ -50,6 +50,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 	Route::put('masjid/update', 'MasjidController@update');
 	Route::delete('masjid/destroy/{id}', 'MasjidController@destroy');
 
+	Route::post('login', 'PenggunaController@login');
 	Route::post('pengguna/store', 'PenggunaController@store');
 	Route::post('pengguna/data', 'PenggunaController@data');
 	Route::get('masjid/show/{id}', 'MasjidController@show');

@@ -5,9 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Level;
 use App\Models\Pengguna;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use DataTables;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class PenggunaController extends Controller
 {
@@ -99,11 +100,11 @@ class PenggunaController extends Controller
     {
     	$input = file_get_contents('php://input');
 	  	$json = json_decode($input, true);
-	  	if (Auth::attempt(['email' => $json['email'], 'password' => $json['password']])) {
+	  	if (Auth::attempt($json)) {
 	  		$data = Auth::user();
 	  		return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
 	  	} else {
-	  		return response()->json(['status' => 401, 'message' => 'failed', 'data' => false]);
+	  		return response()->json(['status' => 401, 'message' => 'unauthorized', 'data' => false]);
 	  	}
     }
 }
