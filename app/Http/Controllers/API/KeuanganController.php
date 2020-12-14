@@ -6,6 +6,7 @@ use App\Models\Keuangan;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
 class KeuanganController extends Controller
 {

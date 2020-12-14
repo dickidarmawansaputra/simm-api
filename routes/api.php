@@ -14,6 +14,18 @@ use Illuminate\Http\Request;
 */
 
 Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
+	Route::group(['prefix' => 'data', 'namespace' => 'Frontend'], function () {
+		Route::get('masjid/show/{id}', 'MasjidController@show');
+		Route::get('masjid/showall', 'MasjidController@showAll');
+		Route::get('kegiatan/show/{id}', 'KegiatanController@show');
+		Route::get('kegiatan/showall', 'KegiatanController@showAll');
+		Route::get('fasilitas/show/{id}', 'FasilitasController@show');
+		Route::get('fasilitas/showall', 'FasilitasController@showAll');
+		Route::get('inventaris/show/{id}', 'InventarisController@show');
+		Route::get('inventaris/showall', 'InventarisController@showAll');
+		Route::get('keuangan/show/{id}', 'KeuanganController@show');
+		Route::get('keuangan/showall', 'KeuanganController@showAll');
+	});
 	Route::post('fasilitas/store', 'FasilitasController@store');
 	Route::post('fasilitas/data', 'FasilitasController@data');
 	Route::get('fasilitas/show/{id}', 'FasilitasController@show');

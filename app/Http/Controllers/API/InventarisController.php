@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Inventaris;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class InventarisController extends Controller
 {

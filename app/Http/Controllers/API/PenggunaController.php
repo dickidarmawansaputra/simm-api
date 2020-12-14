@@ -102,6 +102,9 @@ class PenggunaController extends Controller
 	  	$json = json_decode($input, true);
 	  	if (Auth::attempt($json)) {
 	  		$data = Auth::user();
+	  		return $data->with('level')
+	  			->with('masjid')
+	  			->first();
 	  		return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
 	  	} else {
 	  		return response()->json(['status' => 401, 'message' => 'unauthorized', 'data' => false]);
