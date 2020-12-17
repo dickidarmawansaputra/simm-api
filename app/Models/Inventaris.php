@@ -17,6 +17,6 @@ class Inventaris extends Model
     	'kondisi_inventaris',
     	'deskripsi_inventaris',
     	'masjid_id',
-    	'user_id',
+    	'pengguna_id',
     ];
 }

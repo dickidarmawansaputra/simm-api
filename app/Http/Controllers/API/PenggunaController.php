@@ -9,6 +9,7 @@ use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class PenggunaController extends Controller
 {
@@ -16,6 +17,22 @@ class PenggunaController extends Controller
     {
     	$input = file_get_contents('php://input');
 	  	$json = json_decode($input, true);
+	  	$validator = Validator::make($json, [
+	  	 'nama' => 'required',
+	  	 'username' => 'required|unique:pengguna',
+	  	 'password' => 'required',
+	  	 'foto' => 'required',
+	  	 'masjid_id' => 'required',
+	  	 'level' => 'required',
+	  	]);
+
+	  	if ($validator->fails()) {
+	  	    return response()->json([
+	  	        'status' => 409,
+	  	        'message' => $validator->errors(),
+	  	        'data' => false,
+	  	    ]);
+	  	}
 	  	$json['password'] = Hash::make($json['password']);
 	  	$data = Pengguna::create($json);
 	  	$level = Level::create([
@@ -101,11 +118,9 @@ class PenggunaController extends Controller
     	$input = file_get_contents('php://input');
 	  	$json = json_decode($input, true);
 	  	if (Auth::attempt($json)) {
-	  		$data = Auth::user();
-	  		return $data->with('level')
-	  			->with('masjid')
-	  			->first();
-	  		return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+	  		$user = Auth::user();
+	  		$token = $user->createToken('xRB5g1rqBMX3VGELz1CMdg9FlPrgPQ09hsqSsbHr')->accessToken;
+	  		return response()->json(['status' => 200, 'message' => 'success', 'data' => $user, 'token' => $token]);
 	  	} else {
 	  		return response()->json(['status' => 401, 'message' => 'unauthorized', 'data' => false]);
 	  	}

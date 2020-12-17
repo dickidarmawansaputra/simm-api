@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Controller;
 use App\Models\Keuangan;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class KeuanganController extends Controller
 {
@@ -14,6 +15,23 @@ class KeuanganController extends Controller
     {
         $input = file_get_contents('php://input');
         $json = json_decode($input, true);
+        $validator = Validator::make($json, [
+         'jenis_keuangan' => 'required',
+         'sumber' => 'required',
+         'jumlah' => 'required',
+         'keterangan' => 'required',
+         'tanggal' => 'required',
+         'masjid_id' => 'required',
+         'pengguna_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 409,
+                'message' => $validator->errors(),
+                'data' => false,
+            ]);
+        }
     	$data = Keuangan::create($json);
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
@@ -40,13 +58,39 @@ class KeuanganController extends Controller
     {
         $input = file_get_contents('php://input');
         $json = json_decode($input, true);
+        $validator = Validator::make($json, [
+         'id' => 'required',
+         'jenis_keuangan' => 'required',
+         'sumber' => 'required',
+         'jumlah' => 'required',
+         'keterangan' => 'required',
+         'tanggal' => 'required',
+         'masjid_id' => 'required',
+         'pengguna_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 409,
+                'message' => $validator->errors(),
+                'data' => false,
+            ]);
+        }
         $data = Keuangan::where('id', $json['id'])->update($json);
-        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+        if ($data == 1) {
+            return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
+        } else {
+            return response()->json(['status' => 400, 'message' => 'success', 'data' => false]);
+        }
     }
 
     public function destroy($id)
     {
     	$data = Keuangan::find($id)->delete();
-        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+        if ($data == 1) {
+            return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
+        } else {
+            return response()->json(['status' => 400, 'message' => 'success', 'data' => false]);
+        }
     }
 }
