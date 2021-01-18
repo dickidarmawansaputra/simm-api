@@ -4,18 +4,20 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fasilitas;
+use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Facades\Image;
 
 class FasilitasController extends Controller
 {
-    public function store()
+    public function store(Request $request)
     {
-        $input = file_get_contents('php://input');
-        $json = json_decode($input, true);
-        $validator = Validator::make($json, [
+        $data = $request->all();
+        $validator = Validator::make($request->all(), [
          'nama_fasilitas' => 'required',
          'deskripsi_fasilitas' => 'required',
+         'foto_fasilitas' => 'required',
          'kondisi_fasilitas' => 'required',
          'masjid_id' => 'required',
          'pengguna_id' => 'required',
@@ -28,20 +30,32 @@ class FasilitasController extends Controller
                 'data' => false,
             ]);
         }
-        $data = Fasilitas::create($json);
-        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+
+        if ($request->hasFile('foto_fasilitas')) {
+            $data['foto_fasilitas'] = (string) Image::make($request->foto_fasilitas)->encode('data-url');
+        }
+        $result = Fasilitas::create($data);
+        return response()->json(['status' => 200, 'message' => 'success', 'data' => $result]);
     }
 
-    public function data()
+    public function data(Request $request)
     {
-        $input = file_get_contents('php://input');
-        $json = json_decode($input, true);
-        $data = Fasilitas::where(function($query) use ($json) {
-                    if ($json['level'] == 'operator') {
-                        $query->where('masjid_id', $json['masjid_id']);
+        $model = Fasilitas::where(function($query) use ($request) {
+                    if ($request->level == 'operator') {
+                        $query->where('masjid_id', $request->masjid_id);
                     }
-                })->paginate(10);
-        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+                });
+        return Datatables::of($model)
+            ->addColumn('aksi', function($model) {
+                return '
+                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark" onclick="lihatData('.$model->id.')"><i class="fa fa-eye"></i></a>
+                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-blue2-dark" onclick="editData('.$model->id.')"><i class="fa fa-edit"></i></a>
+                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-red2-dark" onclick="hapusData('.$model->id.')"><i class="fa fa-trash"></i></a>
+                ';
+            })
+            ->addIndexColumn()
+            ->rawColumns(['aksi'])
+            ->make(true);
     }
 
     public function show($id)
@@ -52,9 +66,8 @@ class FasilitasController extends Controller
 
     public function update(Request $request)
     {
-        $input = file_get_contents('php://input');
-        $json = json_decode($input, true);
-        $validator = Validator::make($json, [
+        $data = $request->all();
+        $validator = Validator::make($data, [
          'id' => 'required',
          'nama_fasilitas' => 'required',
          'deskripsi_fasilitas' => 'required',
@@ -70,11 +83,16 @@ class FasilitasController extends Controller
                 'data' => false,
             ]);
         }
-        $data = Fasilitas::where('id', $json['id'])->update($json);
+        if ($request->hasFile('foto_fasilitas')) {
+            $data['foto_fasilitas'] = (string) Image::make($request->foto_fasilitas)->encode('data-url');
+        } else {
+            unset($request->foto_fasilitas);
+        }
+        $data = Fasilitas::find($request->id)->update($data);
         if ($data == 1) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
         } else {
-            return response()->json(['status' => 400, 'message' => 'success', 'data' => false]);
+            return response()->json(['status' => 400, 'message' => 'bad request!', 'data' => false]);
         }
     }
 

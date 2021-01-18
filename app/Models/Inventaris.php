@@ -15,6 +15,7 @@ class Inventaris extends Model
     	'kode_inventaris',
     	'nama_inventaris',
     	'kondisi_inventaris',
+        'foto_inventaris',
     	'deskripsi_inventaris',
     	'masjid_id',
     	'pengguna_id',

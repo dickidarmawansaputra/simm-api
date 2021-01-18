@@ -8,15 +8,23 @@ use Illuminate\Http\Request;
 
 class FasilitasController extends Controller
 {
-    public function show($id)
+    public function show($masjid_id, $id)
 	{
-		$data = Fasilitas::find($id)->first();
+		$data = Fasilitas::where('masjid_id', $masjid_id)
+                ->where('id', $id)
+                ->first();
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
 	}
 
-    public function showAll()
+    public function showAll($masjid_id)
     {
-    	$data = Fasilitas::all();
+    	$data = Fasilitas::where('masjid_id', $masjid_id)->get();
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+    }
+
+    public function data()
+    {
+        $data = Fasilitas::paginate(5);
+        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 }

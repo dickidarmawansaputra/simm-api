@@ -10,13 +10,13 @@ class MasjidController extends Controller
 {
 	public function show($id)
 	{
-		$data = Masjid::find($id)->first();
+		$data = Masjid::where('id', $id)->first();
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
 	}
 
     public function showAll()
     {
-    	$data = Masjid::all();
+    	$data = Masjid::paginate(5);
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 }

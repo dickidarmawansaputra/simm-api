@@ -10,7 +10,7 @@ class KeuanganController extends Controller
 {
     public function show($id)
 	{
-		$data = Keuangan::find($id)->first();
+		$data = Keuangan::where('id', $id)->first();
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
 	}
 

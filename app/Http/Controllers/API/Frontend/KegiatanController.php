@@ -8,15 +8,21 @@ use Illuminate\Http\Request;
 
 class KegiatanController extends Controller
 {
-    public function show($id)
+    public function show($masjid_id, $id)
 	{
-		$data = Kegiatan::find($id)->first();
+		$data = Kegiatan::where('masjid_id', $masjid_id)->where('id', $id)->first();
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
 	}
 
-    public function showAll()
+    public function showAll($masjid_id)
     {
-    	$data = Kegiatan::all();
+    	$data = Kegiatan::where('masjid_id', $masjid_id)->get();
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+    }
+
+    public function data()
+    {
+        $data = Kegiatan::paginate(5);
+        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 }
