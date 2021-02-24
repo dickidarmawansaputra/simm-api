@@ -7,8 +7,9 @@ use App\Models\Kegiatan;
 use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
-use Intervention\Image\Facades\Image;
 
 class KegiatanController extends Controller
 {
@@ -30,9 +31,13 @@ class KegiatanController extends Controller
                 'data' => false,
             ]);
         }
+
         if ($request->hasFile('foto_kegiatan')) {
-            $data['foto_kegiatan'] = (string) Image::make($request->foto_kegiatan)->encode('data-url');
+            $fileName = $request->foto_kegiatan->getClientOriginalName();
+            $path = $request->file('foto_kegiatan')->storeAs('public/kegiatan', $fileName);
+            $data['foto_kegiatan'] = $path;
         }
+
         $data['tanggal_waktu_kegiatan'] = Carbon::parse($request->tanggal_waktu_kegiatan)->format('Y-m-d H:i:s');
 	  	$result = Kegiatan::create($data);
 	  	return response()->json(['status' => 200, 'message' => 'success', 'data' => $result]);
@@ -46,6 +51,9 @@ class KegiatanController extends Controller
                     }
                 });
         return Datatables::of($model)
+            ->addColumn('foto_kegiatan', function($model) {
+                return URL::to('/').''.Storage::url($model['foto_kegiatan']);
+            })
             ->addColumn('aksi', function($model) {
                 return '
                 <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark" onclick="lihatData('.$model->id.')"><i class="fa fa-eye"></i></a>
@@ -61,6 +69,7 @@ class KegiatanController extends Controller
     public function show($id)
     {
         $data = Kegiatan::where('id', $id)->first();
+        $data['foto_kegiatan'] = URL::to('/').''.Storage::url($data->foto_kegiatan);
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
@@ -85,11 +94,17 @@ class KegiatanController extends Controller
                 'data' => false,
             ]);
         }
+
         if ($request->hasFile('foto_kegiatan')) {
-            $data['foto_kegiatan'] = (string) Image::make($request->foto_kegiatan)->encode('data-url');
+            $fileName = $request->foto_kegiatan->getClientOriginalName();
+            $path = $request->file('foto_kegiatan')->storeAs('public/kegiatan', $fileName);
+            $data['foto_kegiatan'] = $path;
         } else {
-            unset($request->foto_kegiatan);
+            unset($data['foto_kegiatan']);
         }
+        
+        $data['tanggal_waktu_kegiatan'] = Carbon::parse($request->tanggal_waktu_kegiatan)->format('Y-m-d H:i:s');
+
 	  	$result = Kegiatan::find($request->id)->update($data);
         if ($result == 1) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
@@ -100,7 +115,9 @@ class KegiatanController extends Controller
 
     public function destroy($id)
     {
-        $data = Kegiatan::where('id', $id)->delete();
+        $data = Kegiatan::find($id);
+        Storage::delete($data->foto_kegiatan);
+        $data->delete();
         if ($data == 1) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
         } else {

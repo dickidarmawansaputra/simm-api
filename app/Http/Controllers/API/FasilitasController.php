@@ -6,15 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Fasilitas;
 use DataTables;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
-use Intervention\Image\Facades\Image;
 
 class FasilitasController extends Controller
 {
     public function store(Request $request)
     {
         $data = $request->all();
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($data, [
          'nama_fasilitas' => 'required',
          'deskripsi_fasilitas' => 'required',
          'foto_fasilitas' => 'required',
@@ -32,8 +33,11 @@ class FasilitasController extends Controller
         }
 
         if ($request->hasFile('foto_fasilitas')) {
-            $data['foto_fasilitas'] = (string) Image::make($request->foto_fasilitas)->encode('data-url');
+            $fileName = $request->foto_fasilitas->getClientOriginalName();
+            $path = $request->file('foto_fasilitas')->storeAs('public/fasilitas', $fileName);
+            $data['foto_fasilitas'] = $path;
         }
+
         $result = Fasilitas::create($data);
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $result]);
     }
@@ -46,6 +50,9 @@ class FasilitasController extends Controller
                     }
                 });
         return Datatables::of($model)
+            ->addColumn('foto_fasilitas', function($model) {
+                return URL::to('/').''.Storage::url($model['foto_fasilitas']);
+            })
             ->addColumn('aksi', function($model) {
                 return '
                 <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark" onclick="lihatData('.$model->id.')"><i class="fa fa-eye"></i></a>
@@ -60,7 +67,8 @@ class FasilitasController extends Controller
 
     public function show($id)
     {
-    	$data = Fasilitas::where('id', $id)->first();
+        $data = Fasilitas::where('id', $id)->first();
+        $data['foto_fasilitas'] = URL::to('/').''.Storage::url($data->foto_fasilitas);
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
@@ -84,10 +92,13 @@ class FasilitasController extends Controller
             ]);
         }
         if ($request->hasFile('foto_fasilitas')) {
-            $data['foto_fasilitas'] = (string) Image::make($request->foto_fasilitas)->encode('data-url');
+            $fileName = $request->foto_fasilitas->getClientOriginalName();
+            $path = $request->file('foto_fasilitas')->storeAs('public/fasilitas', $fileName);
+            $data['foto_fasilitas'] = $path;
         } else {
-            unset($request->foto_fasilitas);
+            unset($data['foto_fasilitas']);
         }
+
         $data = Fasilitas::find($request->id)->update($data);
         if ($data == 1) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
@@ -98,7 +109,9 @@ class FasilitasController extends Controller
 
     public function destroy($id)
     {
-    	$data = Fasilitas::where('id', $id)->delete();
+    	$data = Fasilitas::find($id);
+        Storage::delete($data->foto_fasilitas);
+        $data->delete();
         if ($data == 1) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
         } else {

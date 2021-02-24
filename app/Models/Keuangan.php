@@ -20,4 +20,9 @@ class Keuangan extends Model
     	'masjid_id',
     	'pengguna_id',
     ];
+
+    public function saldo()
+    {
+        return $this->hasOne('App\Models\SaldoKeuangan', 'masjid_id', 'masjid_id');
+    }
 }

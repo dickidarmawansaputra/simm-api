@@ -17,18 +17,21 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 	Route::group(['prefix' => 'data', 'namespace' => 'Frontend'], function () {
 		Route::get('masjid/show/{id}', 'MasjidController@show');
 		Route::get('masjid/showall', 'MasjidController@showAll');
+		Route::get('masjid/showall/detail', 'MasjidController@showAllDetail');
 		Route::get('kegiatan/show/{masjid}/{id}', 'KegiatanController@show');
 		Route::get('kegiatan/showall/{masjid}', 'KegiatanController@showAll');
 		Route::get('kegiatan/data', 'KegiatanController@data');
+		Route::get('kegiatan/dataall', 'KegiatanController@dataAll');
 		Route::get('fasilitas/show/{masjid}/{id}', 'FasilitasController@show');
 		Route::get('fasilitas/showall/{masjid}', 'FasilitasController@showAll');
 		Route::get('fasilitas/data', 'FasilitasController@data');
+		Route::get('fasilitas/dataall', 'FasilitasController@dataAll');
 		Route::get('kepengurusan/show/{masjid}/{id}', 'KepengurusanController@show');
 		Route::get('kepengurusan/showall/{masjid}', 'KepengurusanController@showAll');
-		// Route::get('inventaris/show/{id}', 'InventarisController@show');
-		// Route::get('inventaris/showall', 'InventarisController@showAll');
-		// Route::get('keuangan/show/{id}', 'KeuanganController@show');
-		// Route::get('keuangan/showall', 'KeuanganController@showAll');
+		Route::get('inventaris/show/{masjid}/{id}', 'InventarisController@show');
+		Route::get('inventaris/showall/{masjid}', 'InventarisController@showAll');
+		Route::get('keuangan/show/{masjid}/{id}', 'KeuanganController@show');
+		Route::get('keuangan/showall/{masjid}', 'KeuanganController@showAll');
 	});
 	Route::post('login', 'PenggunaController@login');
 	Route::group(['middleware' => 'auth:api'], function () {
@@ -70,8 +73,14 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 
 		Route::post('pengguna/store', 'PenggunaController@store');
 		Route::get('pengguna/data', 'PenggunaController@data');
-		Route::get('masjid/show/{id}', 'MasjidController@show');
+		Route::get('pengguna/show/{id}', 'PenggunaController@show');
 		Route::put('pengguna/update', 'PenggunaController@update');
-		Route::delete('pengguna/destroy', 'PenggunaController@destroy');
+		Route::delete('pengguna/destroy/{id}', 'PenggunaController@destroy');
+		Route::post('laporan/data', 'LaporanController@data');
 	});
+	Route::get('laporan/datas', 'LaporanController@datas');
+	Route::get('laporan/keuangan/pdf/{masjid}/{id}', 'LaporanController@pdfKeuangan');
+	Route::get('laporan/keuangan/pdf/{masjid}', 'LaporanController@pdfKeuanganAll');
+	// Route::get('laporan/keuangan/excel/{id}', 'LaporanController@excelKeuangan');
+	Route::get('laporan/keuangan/excel/{masjid}', 'LaporanController@excelKeuanganAll');
 });

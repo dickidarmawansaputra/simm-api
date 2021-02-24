@@ -13,13 +13,20 @@ class KepengurusanController extends Controller
 {
     public function show($masjid_id, $id)
     {
-        $data = Kepengurusan::where('masjid_id', $masjid_id)->where('id', $id)->first();
+        $data = Kepengurusan::leftJoin('masjid', 'kepengurusan.masjid_id', 'masjid.id')
+            ->where('kepengurusan.masjid_id', $masjid_id)
+            ->where('kepengurusan.id', $id)
+            ->select('nama', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'jabatan', 'periode', 'no_hp', 'email', 'masjid_id', 'masjid.nama_masjid')
+            ->first();
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
     public function showAll($masjid_id)
     {
-        $data = Kepengurusan::where('masjid_id', $masjid_id)->get();
+        $data = Kepengurusan::leftJoin('masjid', 'kepengurusan.masjid_id', 'masjid.id')
+            ->where('kepengurusan.masjid_id', $masjid_id)
+            ->select('nama', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'jabatan', 'periode', 'no_hp', 'email', 'masjid_id', 'masjid.nama_masjid')
+            ->get();
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 }

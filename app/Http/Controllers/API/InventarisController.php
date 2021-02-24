@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Inventaris;
 use DataTables;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
-use Intervention\Image\Facades\Image;
 
 class InventarisController extends Controller
 {
@@ -33,7 +34,9 @@ class InventarisController extends Controller
         }
 
         if ($request->hasFile('foto_inventaris')) {
-            $data['foto_inventaris'] = (string) Image::make($request->foto_inventaris)->encode('data-url');
+            $fileName = $request->foto_inventaris->getClientOriginalName();
+            $path = $request->file('foto_inventaris')->storeAs('public/inventaris', $fileName);
+            $data['foto_inventaris'] = $path;
         }
 
     	$result = Inventaris::create($data);
@@ -48,6 +51,9 @@ class InventarisController extends Controller
                     }
                 });
         return Datatables::of($model)
+            ->addColumn('foto_inventaris', function($model) {
+                return URL::to('/').''.Storage::url($model['foto_inventaris']);
+            })
             ->addColumn('aksi', function($model) {
                 return '
                 <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark" onclick="lihatData('.$model->id.')"><i class="fa fa-eye"></i></a>
@@ -63,6 +69,7 @@ class InventarisController extends Controller
     public function show($id)
     {
     	$data = Inventaris::where('id', $id)->first();
+        $data['foto_inventaris'] = URL::to('/').''.Storage::url($data->foto_inventaris);
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
@@ -85,11 +92,15 @@ class InventarisController extends Controller
                 'data' => false,
             ]);
         }
+
         if ($request->hasFile('foto_inventaris')) {
-            $data['foto_inventaris'] = (string) Image::make($request->foto_inventaris)->encode('data-url');
+            $fileName = $request->foto_inventaris->getClientOriginalName();
+            $path = $request->file('foto_inventaris')->storeAs('public/inventaris', $fileName);
+            $data['foto_inventaris'] = $path;
         } else {
-            unset($request->foto_inventaris);
+            unset($data['foto_inventaris']);
         }
+        
         $result = Inventaris::find($request->id)->update($data);
         if ($result == 1) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
@@ -100,7 +111,9 @@ class InventarisController extends Controller
 
     public function destroy($id)
     {
-    	$data = Inventaris::where('id', $id)->delete();
+    	$data = Inventaris::find($id);
+        Storage::delete($data->foto_inventaris);
+        $data->delete();
         if ($data == 1) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
         } else {
