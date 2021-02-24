@@ -34,4 +34,18 @@ class InventarisController extends Controller
         }
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
+
+    public function showAllLimit($masjid_id)
+    {
+        $data = Inventaris::leftJoin('masjid', 'inventaris.masjid_id', 'masjid.id')
+            ->where('inventaris.masjid_id', $masjid_id)
+            ->select('inventaris.id', 'kode_inventaris', 'nama_inventaris', 'kondisi_inventaris', 'foto_inventaris', 'deskripsi_inventaris', 'masjid_id', 'masjid.nama_masjid')
+            ->limit(3)
+            ->get();
+        foreach ($data as $key => $value) {
+            $foto_inventaris = URL::to('/').''.Storage::url($value['foto_inventaris']);
+            $value['foto_inventaris'] = $foto_inventaris;
+        }
+        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+    }
 }

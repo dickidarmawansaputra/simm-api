@@ -26,4 +26,14 @@ class KeuanganController extends Controller
             ->get();
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
+
+    public function showAllLimit($masjid_id)
+    {
+        $data = Keuangan::leftJoin('masjid', 'keuangan.masjid_id', 'masjid.id')
+            ->where('keuangan.masjid_id', $masjid_id)
+            ->select('jenis_keuangan', 'sumber', 'jumlah', 'keterangan', 'tanggal', 'masjid_id', 'masjid.nama_masjid')
+            ->limit(3)
+            ->get();
+        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+    }
 }

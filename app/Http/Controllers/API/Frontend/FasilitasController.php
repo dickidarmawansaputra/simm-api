@@ -34,6 +34,20 @@ class FasilitasController extends Controller
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
+    public function showAllLimit($masjid_id)
+    {
+        $data = Fasilitas::leftJoin('masjid', 'fasilitas.masjid_id', 'masjid.id')
+            ->select('fasilitas.id', 'nama_fasilitas', 'deskripsi_fasilitas', 'foto_fasilitas', 'kondisi_fasilitas', 'masjid_id', 'masjid.nama_masjid')
+            ->where('fasilitas.masjid_id', $masjid_id)
+            ->limit(3)
+            ->get();
+        foreach ($data as $key => $value) {
+            $foto_fasilitas = URL::to('/').''.Storage::url($value['foto_fasilitas']);
+            $value['foto_fasilitas'] = $foto_fasilitas;
+        }
+        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+    }
+
     public function data()
     {
         $data = Fasilitas::leftJoin('masjid', 'fasilitas.masjid_id', 'masjid.id')

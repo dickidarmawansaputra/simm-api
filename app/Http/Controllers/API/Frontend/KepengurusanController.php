@@ -29,4 +29,14 @@ class KepengurusanController extends Controller
             ->get();
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
+
+    public function showAllLimit($masjid_id)
+    {
+        $data = Kepengurusan::leftJoin('masjid', 'kepengurusan.masjid_id', 'masjid.id')
+            ->where('kepengurusan.masjid_id', $masjid_id)
+            ->select('nama', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'jabatan', 'periode', 'no_hp', 'email', 'masjid_id', 'masjid.nama_masjid')
+            ->limit(3)
+            ->get();
+        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+    }
 }

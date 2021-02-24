@@ -20,18 +20,23 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 		Route::get('masjid/showall/detail', 'MasjidController@showAllDetail');
 		Route::get('kegiatan/show/{masjid}/{id}', 'KegiatanController@show');
 		Route::get('kegiatan/showall/{masjid}', 'KegiatanController@showAll');
+		Route::get('kegiatan/showall/limit/{masjid}', 'KegiatanController@showAllLimit');
 		Route::get('kegiatan/data', 'KegiatanController@data');
 		Route::get('kegiatan/dataall', 'KegiatanController@dataAll');
 		Route::get('fasilitas/show/{masjid}/{id}', 'FasilitasController@show');
 		Route::get('fasilitas/showall/{masjid}', 'FasilitasController@showAll');
+		Route::get('fasilitas/showall/limit/{masjid}', 'FasilitasController@showAllLimit');
 		Route::get('fasilitas/data', 'FasilitasController@data');
 		Route::get('fasilitas/dataall', 'FasilitasController@dataAll');
 		Route::get('kepengurusan/show/{masjid}/{id}', 'KepengurusanController@show');
 		Route::get('kepengurusan/showall/{masjid}', 'KepengurusanController@showAll');
+		Route::get('kepengurusan/showall/limit/{masjid}', 'KepengurusanController@showAllLimit');
 		Route::get('inventaris/show/{masjid}/{id}', 'InventarisController@show');
 		Route::get('inventaris/showall/{masjid}', 'InventarisController@showAll');
+		Route::get('inventaris/showall/limit/{masjid}', 'InventarisController@showAllLimit');
 		Route::get('keuangan/show/{masjid}/{id}', 'KeuanganController@show');
 		Route::get('keuangan/showall/{masjid}', 'KeuanganController@showAll');
+		Route::get('keuangan/showall/limit/{masjid}', 'KeuanganController@showAllLimit');
 	});
 	Route::post('login', 'PenggunaController@login');
 	Route::group(['middleware' => 'auth:api'], function () {

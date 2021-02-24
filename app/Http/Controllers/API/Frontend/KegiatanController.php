@@ -35,6 +35,21 @@ class KegiatanController extends Controller
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
+    public function showAllLimit($masjid_id)
+    {
+        $data = Kegiatan::leftJoin('masjid', 'kegiatan.masjid_id', 'masjid.id')
+            ->select('kegiatan.id', 'kegiatan.nama_kegiatan', 'kegiatan.deskripsi_kegiatan', 'kegiatan.jenis_kegiatan', 'kegiatan.foto_kegiatan', 'kegiatan.tanggal_waktu_kegiatan', 'masjid.nama_masjid', 'masjid.alamat_masjid', 'masjid_id')
+            ->where('kegiatan.masjid_id', $masjid_id)
+            ->orderBy('kegiatan.id', 'DESC')
+            ->limit(3)
+            ->get();
+        foreach ($data as $key => $value) {
+            $foto_kegiatan = URL::to('/').''.Storage::url($value['foto_kegiatan']);
+            $value['foto_kegiatan'] = $foto_kegiatan;
+        }
+        return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+    }
+
     public function data()
     {
         $data = Kegiatan::leftJoin('masjid', 'kegiatan.masjid_id', 'masjid.id')
