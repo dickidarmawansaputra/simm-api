@@ -9,8 +9,9 @@ use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
-use Intervention\Image\Facades\Image;
 
 class PenggunaController extends Controller
 {
@@ -33,8 +34,13 @@ class PenggunaController extends Controller
 	  	}
 	  	$data['password'] = Hash::make($data['password']);
 	  	if ($request->hasFile('foto')) {
-            $data['foto'] = (string) Image::make($request->foto)->encode('data-url');
+            $fileName = $request->foto->getClientOriginalName();
+            $path = $request->file('foto')->storeAs('public/pengguna', $fileName);
+            $data['foto'] = $path;
+        } else {
+        	$data['foto'] = 'public/pengguna/avatar.png';
         }
+	  	
 	  	$result = Pengguna::create($data);
 	  	$level = Level::create([
 	  		'pengguna_id' => $result->id,
@@ -47,6 +53,9 @@ class PenggunaController extends Controller
     {
     	$model = Pengguna::with('level');
     	return Datatables::of($model)
+    		->addColumn('foto', function($model) {
+                return URL::to('/').''.Storage::url($model['foto']);
+            })
     	    ->addColumn('level', function($model) {
     	    	if ($model->level['level'] == 'admin') {
     	    		return '<span class="chip chip-small bg-gray1-dark">
@@ -84,8 +93,6 @@ class PenggunaController extends Controller
     	$validator = Validator::make($data, [
     	 'id' => 'required',
     	 'nama' => 'required',
-    	 'username' => 'unique:pengguna',
-    	 'masjid_id' => 'required',
     	 'level' => 'required',
     	]);
 
@@ -96,6 +103,7 @@ class PenggunaController extends Controller
     	        'data' => false,
     	    ]);
     	}
+    	
     	if ($request->hasFile('foto')) {
             $fileName = $request->foto->getClientOriginalName();
             $path = $request->file('foto')->storeAs('public/pengguna', $fileName);
@@ -103,6 +111,7 @@ class PenggunaController extends Controller
         } else {
             unset($data['foto']);
         }
+
         if (isset($request->password)) {
             $data['password'] = Hash::make($request->password);
         } else {
@@ -117,59 +126,23 @@ class PenggunaController extends Controller
 		} else {
 			return response()->json(['status' => 400, 'message' => 'bad request!', 'data' => false]);
 		}
-	  	// if ($json['password']) {
-	  	// 	if ($json['foto']) {
-			 //  	$json['password'] = Hash::make($json['password']);
-			 //  	$data = Pengguna::where('id', $json['id'])->update([
-			 //  		'nama' => $json['nama'],
-			 //  		'email' => $json['email'],
-			 //  		'password' => $json['password'],
-			 //  		'foto' => $json['foto'],
-			 //  		'masjid_id' => $json['masjid_id']
-			 //  	]);
-			 //  	$level = Level::where('pengguna_id', $json['id'])->update([
-			 //  		'level' => $json['level']
-			 //  	]);
-	  	// 	} else {
-	  	// 		unset($json['foto']);
-	  	// 		$data = Pengguna::where('id', $json['id'])->update([
-	  	// 			'nama' => $json['nama'],
-	  	// 			'email' => $json['email'],
-	  	// 			'masjid_id' => $json['masjid_id']
-	  	// 		]);
-	  	// 		$level = Level::where('pengguna_id', $json['id'])->update([
-	  	// 			'level' => $json['level']
-	  	// 		]);
-	  	// 	}
-		  // 	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
-	  	// } else {
-	  	//     unset($json['password']);
-	  	//     $data = Pengguna::where('id', $json['id'])->update([
-	  	//     	'nama' => $json['nama'],
-	  	//     	'email' => $json['email'],
-	  	//     	'foto' => $json['foto'],
-	  	//     	'masjid_id' => $json['masjid_id']
-	  	//     ]);
-	  	//     $level = Level::where('pengguna_id', $json['id'])->update([
-	  	//     	'level' => $json['level']
-	  	//     ]);
-		  // 	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
-	  	// }
     }
 
     public function destroy($id)
     {
-	  	$data = Pengguna::where('id', $id)->delete();
+	  	$data = Pengguna::find($id);
+	  	Storage::delete($data->foto);
+        $data->delete();
 	  	$level = Level::where('pengguna_id', $id)->delete();
 	  	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
-    public function login()
+    public function login(Request $request)
     {
-    	$input = file_get_contents('php://input');
-	  	$json = json_decode($input, true);
-	  	if (Auth::attempt($json)) {
+	  	$auth = Auth::attempt(['username' => $request->username, 'password' => $request->password]);
+	  	if ($auth) {
 	  		$user = Auth::user()->with('level')->first();
+	  		$user['foto'] = URL::to('/').''.Storage::url($user['foto']); 
 	  		$token = $user->createToken('xRB5g1rqBMX3VGELz1CMdg9FlPrgPQ09hsqSsbHr')->accessToken;
 	  		return response()->json(['status' => 200, 'message' => 'success', 'data' => $user, 'token' => $token]);
 	  	} else {
@@ -177,8 +150,8 @@ class PenggunaController extends Controller
 	  	}
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-    	# code...
+        return $request->user()->token()->revoke();
     }
 }

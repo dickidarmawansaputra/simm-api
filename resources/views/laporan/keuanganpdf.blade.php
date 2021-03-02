@@ -31,6 +31,7 @@
 	</table> --}}
 	<hr>
 	<div class="format">
+		@if(count($data['history']) > 0)
 		<table cellpadding="1" cellspacing="0" border="1">
 			<thead>
 				<tr>
@@ -70,6 +71,9 @@
 				</tr>
 			</tbody>
 		</table>
+		@else
+		<h1>Data tidak ditemukan!</h1>
+		@endif
 	</div>
 </body>
 </html>
