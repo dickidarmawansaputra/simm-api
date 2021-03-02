@@ -86,9 +86,7 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 		Route::delete('pengguna/destroy/{id}', 'PenggunaController@destroy');
 		Route::post('laporan/data', 'LaporanController@data');
 	});
-	Route::get('laporan/datas', 'LaporanController@datas');
 	Route::get('laporan/keuangan/pdf/{masjid}/{id}', 'LaporanController@pdfKeuangan');
 	Route::get('laporan/keuangan/pdf/{masjid}', 'LaporanController@pdfKeuanganAll');
-	// Route::get('laporan/keuangan/excel/{id}', 'LaporanController@excelKeuangan');
 	Route::get('laporan/keuangan/excel/{masjid}', 'LaporanController@excelKeuanganAll');
 });

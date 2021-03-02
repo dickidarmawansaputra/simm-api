@@ -52,7 +52,7 @@ class LaporanController extends Controller
             ->addColumn('aksi', function($model) use ($request) {
                 return '
                 <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark"><i class="fa fa-file-excel"></i></a>
-                <a href="https://simmapi.zethlabs.id/api/v1/laporan/keuangan/pdf/'.$request->masjid_id.'" target="_blank" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-red2-dark"><i class="fa fa-file-pdf"></i></a>
+                <a href="#" target="_blank" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-red2-dark"><i class="fa fa-file-pdf"></i></a>
                 ';
             })
             ->addIndexColumn()
@@ -60,32 +60,10 @@ class LaporanController extends Controller
             ->make(true);
     }
 
-    public function datas(Request $request)
-    {
-        return$model = Keuangan::with('saldo')->get();
-        $model = SaldoKeuangan::with('history')->get();
-                // ->where(function($query) use ($request) {
-                //     if ($request->level == 'operator') {
-                //         $query->where('masjid_id', $request->masjid_id);
-                //     }
-                // });
-        return Datatables::of($model)
-            ->addColumn('aksi', function($model) {
-                return '
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark" onclick="lihatData('.$model->id.')"><i class="fa fa-eye"></i></a>
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-blue2-dark" onclick="editData('.$model->id.')"><i class="fa fa-edit"></i></a>
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-red2-dark" onclick="hapusData('.$model->id.')"><i class="fa fa-trash"></i></a>
-                ';
-            })
-            ->addIndexColumn()
-            ->rawColumns(['aksi'])
-            ->make(true);
-    }
-
     public function pdfKeuangan($masjid_id, $id)
     {
-        return $data = Keuangan::where('masjid_id', $masjid_id)->where('id', $id)->first();
-    	return$data = SaldoKeuangan::with('history')
+        $data = Keuangan::where('masjid_id', $masjid_id)->where('id', $id)->first();
+    	$data = SaldoKeuangan::with('history')
     		->leftJoin('masjid', 'saldo_keuangan.masjid_id', 'masjid.id')
     		->where('saldo_keuangan.masjid_id', $masjid_id)
     		->select('saldo_keuangan.id', 'saldo_keuangan.masjid_id', 'saldo_keuangan.saldo', 'masjid.nama_masjid', 'masjid.tipologi_masjid')
@@ -109,24 +87,4 @@ class LaporanController extends Controller
     {
         return Excel::download(new KeuanganExport($masjid_id), 'Laporan Keuangan.xlsx');
     }
-
-    // public function excelKeuangan($masjid_id)
-    // {
-    // 	$data = SaldoKeuangan::with('history')
-    // 		->leftJoin('masjid', 'saldo_keuangan.masjid_id', 'masjid.id')
-    // 		->where('saldo_keuangan.masjid_id', $masjid_id)
-    // 		->select('saldo_keuangan.id', 'saldo_keuangan.masjid_id', 'saldo_keuangan.saldo', 'masjid.nama_masjid', 'masjid.tipologi_masjid')
-    // 		->first();
-    // 	return Excel::download(new KeuanganExport($data), 'Data Keuangan.xlsx');
-    // }
-
-    // public function excelKeuanganAll()
-    // {
-    // 	$data = SaldoKeuangan::with('history')
-    // 		->leftJoin('masjid', 'saldo_keuangan.masjid_id', 'masjid.id')
-    // 		->where('saldo_keuangan.masjid_id', $masjid_id)
-    // 		->select('saldo_keuangan.id', 'saldo_keuangan.masjid_id', 'saldo_keuangan.saldo', 'masjid.nama_masjid', 'masjid.tipologi_masjid')
-    // 		->get();
-    // 	return Excel::download(new KeuanganExport($data), 'Data Keuangan.xlsx');
-    // }
 }
