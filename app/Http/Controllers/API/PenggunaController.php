@@ -34,7 +34,7 @@ class PenggunaController extends Controller
 	  	}
 	  	$data['password'] = Hash::make($data['password']);
 	  	if ($request->hasFile('foto')) {
-            $fileName = $request->foto->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->foto->getClientOriginalName()));
             $path = $request->file('foto')->storeAs('public/pengguna', $fileName);
             $data['foto'] = $path;
         } else {
@@ -84,6 +84,7 @@ class PenggunaController extends Controller
     public function show($id)
     {
     	$data = Pengguna::with('level')->where('id', $id)->first();
+        $data['foto'] = URL::to('/').''.Storage::url($data['foto']);
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
@@ -105,7 +106,7 @@ class PenggunaController extends Controller
     	}
     	
     	if ($request->hasFile('foto')) {
-            $fileName = $request->foto->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->foto->getClientOriginalName()));
             $path = $request->file('foto')->storeAs('public/pengguna', $fileName);
             $data['foto'] = $path;
         } else {
@@ -141,10 +142,9 @@ class PenggunaController extends Controller
     {
 	  	$auth = Auth::attempt(['username' => $request->username, 'password' => $request->password]);
 	  	if ($auth) {
-	  		$user = Auth::user()->with('level')->first();
-	  		$user['foto'] = URL::to('/').''.Storage::url($user['foto']); 
-	  		$token = $user->createToken('xRB5g1rqBMX3VGELz1CMdg9FlPrgPQ09hsqSsbHr')->accessToken;
-	  		return response()->json(['status' => 200, 'message' => 'success', 'data' => $user, 'token' => $token]);
+	  		$user = Auth::user();
+	  		$token = $user->createToken($user->password)->accessToken;
+	  		return response()->json(['status' => 200, 'message' => 'success', 'token' => $token]);
 	  	} else {
 	  		return response()->json(['status' => 401, 'message' => 'unauthorized', 'data' => false]);
 	  	}
@@ -153,5 +153,12 @@ class PenggunaController extends Controller
     public function logout(Request $request)
     {
         return $request->user()->token()->revoke();
+    }
+
+    public function user(Request $request)
+    {
+        $user = Auth::user();
+        $user['foto'] = URL::to('/').''.Storage::url($user['foto']);
+        return response()->json(['status' => 200, 'message' => 'success', 'user' => $user, 'level' => Auth::user()->level['level']]);
     }
 }

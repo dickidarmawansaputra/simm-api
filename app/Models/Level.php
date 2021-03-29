@@ -16,9 +16,9 @@ class Level extends Model
     	'pengguna_id', 'level',
     ];
 
-    public static function isLevel($level_check)
-    {
-        $user_level = self::where(['pengguna_id'=> Auth::user()->id, 'level'=> $level_check])->first();
-        return $user_level ? true : false;
-    }
+    // public static function isLevel($level_check)
+    // {
+    //     $user_level = self::where(['pengguna_id'=> Auth::user()->id, 'level'=> $level_check])->first();
+    //     return $user_level ? true : false;
+    // }
 }

@@ -39,7 +39,7 @@ class MasjidController extends Controller
         }
 
         if ($request->hasFile('gambar')) {
-            $fileName = $request->gambar->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->gambar->getClientOriginalName()));
             $path = $request->file('gambar')->storeAs('public/masjid', $fileName);
             $data['gambar'] = $path;
         }
@@ -99,7 +99,7 @@ class MasjidController extends Controller
             ]);
         }
         if ($request->hasFile('gambar')) {
-            $fileName = $request->gambar->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->gambar->getClientOriginalName()));
             $path = $request->file('gambar')->storeAs('public/masjid', $fileName);
             $data['gambar'] = $path;
         } else {

@@ -33,7 +33,7 @@ class FasilitasController extends Controller
         }
 
         if ($request->hasFile('foto_fasilitas')) {
-            $fileName = $request->foto_fasilitas->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->foto_fasilitas->getClientOriginalName()));
             $path = $request->file('foto_fasilitas')->storeAs('public/fasilitas', $fileName);
             $data['foto_fasilitas'] = $path;
         }
@@ -92,7 +92,7 @@ class FasilitasController extends Controller
             ]);
         }
         if ($request->hasFile('foto_fasilitas')) {
-            $fileName = $request->foto_fasilitas->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->foto_fasilitas->getClientOriginalName()));
             $path = $request->file('foto_fasilitas')->storeAs('public/fasilitas', $fileName);
             $data['foto_fasilitas'] = $path;
         } else {

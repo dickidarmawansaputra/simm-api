@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\API\Frontend;
 
-use App\Exports\KeuanganExport;
+use App\Exports\KeuanganFrontExport;
 use App\Http\Controllers\Controller;
 use App\Models\Keuangan;
 use App\Models\SaldoKeuangan;
+use Excel;
 use Illuminate\Http\Request;
 use PDF;
-use Excel;
 
 class KeuanganController extends Controller
 {
@@ -54,6 +54,6 @@ class KeuanganController extends Controller
 
     public function excel($masjid_id)
     {
-        return Excel::download(new KeuanganExport($masjid_id), 'Laporan Keuangan.xlsx');
+        return Excel::download(new KeuanganFrontExport($masjid_id), 'Laporan Keuangan.xlsx');
     }
 }

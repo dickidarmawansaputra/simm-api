@@ -33,7 +33,7 @@ class KegiatanController extends Controller
         }
 
         if ($request->hasFile('foto_kegiatan')) {
-            $fileName = $request->foto_kegiatan->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->foto_kegiatan->getClientOriginalName()));
             $path = $request->file('foto_kegiatan')->storeAs('public/kegiatan', $fileName);
             $data['foto_kegiatan'] = $path;
         }
@@ -96,7 +96,7 @@ class KegiatanController extends Controller
         }
 
         if ($request->hasFile('foto_kegiatan')) {
-            $fileName = $request->foto_kegiatan->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->foto_kegiatan->getClientOriginalName()));
             $path = $request->file('foto_kegiatan')->storeAs('public/kegiatan', $fileName);
             $data['foto_kegiatan'] = $path;
         } else {

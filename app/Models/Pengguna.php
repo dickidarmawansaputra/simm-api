@@ -34,7 +34,7 @@ class Pengguna extends Authenticatable
 
     public function level()
     {
-        return $this->hasOne('App\Models\Level', 'pengguna_id', 'id');
+        return $this->hasOne('App\Models\Level');
     }
 
     public function masjid()

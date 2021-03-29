@@ -34,7 +34,7 @@ class InventarisController extends Controller
         }
 
         if ($request->hasFile('foto_inventaris')) {
-            $fileName = $request->foto_inventaris->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->foto_inventaris->getClientOriginalName()));
             $path = $request->file('foto_inventaris')->storeAs('public/inventaris', $fileName);
             $data['foto_inventaris'] = $path;
         }
@@ -94,7 +94,7 @@ class InventarisController extends Controller
         }
 
         if ($request->hasFile('foto_inventaris')) {
-            $fileName = $request->foto_inventaris->getClientOriginalName();
+            $fileName = str_replace(' ', '-', strtolower($request->foto_inventaris->getClientOriginalName()));
             $path = $request->file('foto_inventaris')->storeAs('public/inventaris', $fileName);
             $data['foto_inventaris'] = $path;
         } else {

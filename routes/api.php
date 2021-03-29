@@ -84,9 +84,21 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 		Route::get('pengguna/show/{id}', 'PenggunaController@show');
 		Route::post('pengguna/update', 'PenggunaController@update');
 		Route::delete('pengguna/destroy/{id}', 'PenggunaController@destroy');
-		Route::post('laporan/data', 'LaporanController@data');
+		Route::post('laporan/data/keuangan', 'LaporanController@dataKeuangan');
+		Route::post('laporan/data/kegiatan', 'LaporanController@dataKegiatan');
+		Route::post('laporan/data/inventaris', 'LaporanController@dataInventaris');
+		Route::get('user', 'PenggunaController@user');
+
 	});
-	Route::get('laporan/keuangan/pdf/{masjid}/{id}', 'LaporanController@pdfKeuangan');
-	Route::get('laporan/keuangan/pdf/{masjid}', 'LaporanController@pdfKeuanganAll');
-	Route::get('laporan/keuangan/excel/{masjid}', 'LaporanController@excelKeuanganAll');
+	Route::get('laporan/keuangan/pdf/{masjid}/{id}', 'LaporanController@pdfKeuangan')->name('pdf.keuangan');
+	Route::get('laporan/kegiatan/pdf/{masjid}/{id}', 'LaporanController@pdfKegiatan')->name('pdf.kegiatan');
+	Route::get('laporan/inventaris/pdf/{masjid}/{id}', 'LaporanController@pdfInventaris')->name('pdf.inventaris');
+	Route::post('laporan/keuangan/pdf/{masjid}', 'LaporanController@pdfKeuanganAll');
+	Route::post('laporan/kegiatan/pdf/{masjid}', 'LaporanController@pdfKegiatanAll');
+	Route::post('laporan/inventaris/pdf/{masjid}', 'LaporanController@pdfInventarisAll');
+	Route::post('laporan/keuangan/excel/{masjid}', 'LaporanController@excelKeuanganAll');
+	Route::post('laporan/inventaris/excel/{masjid}', 'LaporanController@excelInventarisAll');
+	Route::post('laporan/kegiatan/excel/{masjid}', 'LaporanController@excelKegiatanAll');
+	Route::get('laporan/keuangan/excel/{masjid}/{id}', 'LaporanController@excelKeuangan')->name('excel.keuangan');
+	Route::get('laporan/kegiatan/excel/{masjid}/{id}', 'LaporanController@excelKegiatan')->name('excel.kegiatan');
 });

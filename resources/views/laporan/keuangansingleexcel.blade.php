@@ -33,7 +33,7 @@
         <tr>
             <td colspan="2"><b>Total Saldo</b></td>
             <td colspan="4">
-                Rp. {{ number_format($keuangan->saldo,0,',','.') }}
+                Rp. {{ number_format($keuangan->history[0]['jumlah'],0,',','.') }}
             </td>
         </tr>
     </tbody>
