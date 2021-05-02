@@ -4,7 +4,7 @@
         <tr>
             <th>Nama Kegiatan</th>
             <th>Jenis Kegiatan</th>
-            <th>Tanggal & Waktu Kegiatan</th>
+            <th>Tanggal Waktu Kegiatan</th>
             <th>Pemateri Kegiatan</th>
         </tr>
     </thead>

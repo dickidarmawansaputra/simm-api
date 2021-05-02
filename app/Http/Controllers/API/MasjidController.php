@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Masjid;
-use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -50,21 +49,12 @@ class MasjidController extends Controller
 
     public function data()
     {
-        $model = Masjid::all();
-        return Datatables::of($model)
-            ->addColumn('gambar', function($model) {
-                return URL::to('/').''.Storage::url($model['gambar']);
-            })
-            ->addColumn('aksi', function($model) {
-                return '
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark" onclick="lihatData('.$model->id.')"><i class="fa fa-eye"></i></a>
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-blue2-dark" onclick="editData('.$model->id.')"><i class="fa fa-edit"></i></a>
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-red2-dark" onclick="hapusData('.$model->id.')"><i class="fa fa-trash"></i></a>
-                ';
-            })
-            ->addIndexColumn()
-            ->rawColumns(['aksi'])
-            ->make(true);
+        $data = Masjid::all();
+        if (count($data) > 0) {
+            return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+        } else {
+            return response()->json(['status' => 404, 'message' => 'not found!', 'data' => null]);
+        }
     }
 
     public function show($id)
@@ -118,7 +108,7 @@ class MasjidController extends Controller
     	$data = Masjid::find($id);
         Storage::delete($data->gambar);
         $data->delete();
-        if ($data == 1) {
+        if ($data) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
         } else {
             return response()->json(['status' => 400, 'message' => 'success', 'data' => false]);

@@ -2,12 +2,12 @@
 
 namespace App\Exports;
 
-use App\Models\Kegiatan;
+use App\Models\Inventaris;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class KegiatanSingleExport implements FromView, ShouldAutoSize
+class InventarisSingleExport implements FromView, ShouldAutoSize
 {
 	public $masjid_id, $id;
 
@@ -19,8 +19,8 @@ class KegiatanSingleExport implements FromView, ShouldAutoSize
 
     public function view(): View
     {
-        return view('laporan.kegiatansingleexcel', [
-            'kegiatan' => Kegiatan::where('masjid_id', $this->masjid_id)
+        return view('laporan.inventarissingleexcel', [
+            'inventaris' => Inventaris::where('masjid_id', $this->masjid_id)
                             ->where('id', $this->id)
                             ->first()
         ]);

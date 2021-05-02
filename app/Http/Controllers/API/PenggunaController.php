@@ -3,15 +3,18 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ResetPassword;
 use App\Models\Level;
 use App\Models\Pengguna;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class PenggunaController extends Controller
 {
@@ -51,34 +54,15 @@ class PenggunaController extends Controller
 
     public function data()
     {
-    	$model = Pengguna::with('level');
-    	return Datatables::of($model)
-    		->addColumn('foto', function($model) {
-                return URL::to('/').''.Storage::url($model['foto']);
-            })
-    	    ->addColumn('level', function($model) {
-    	    	if ($model->level['level'] == 'admin') {
-    	    		return '<span class="chip chip-small bg-gray1-dark">
-                    		<i class="fa fa-check bg-green1-dark"></i>
-                    		<strong class="color-black font-400">Admin</strong>
-                			</span>';
-    	    	} else {
-		    		return '<span class="chip chip-small bg-gray1-dark">
-	                		<i class="fa fa-check bg-green1-dark"></i>
-	                		<strong class="color-black font-400">Operator</strong>
-	            			</span>';
-    	    	}
-    	    })
-    	    ->addColumn('aksi', function($model) {
-    	        return '
-    	        <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark" onclick="lihatData('.$model->id.')"><i class="fa fa-eye"></i></a>
-    	        <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-blue2-dark" onclick="editData('.$model->id.')"><i class="fa fa-edit"></i></a>
-    	        <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-red2-dark" onclick="hapusData('.$model->id.')"><i class="fa fa-trash"></i></a>
-    	        ';
-    	    })
-    	    ->addIndexColumn()
-    	    ->rawColumns(['aksi', 'level'])
-    	    ->make(true);
+    	$data = Pengguna::with('level')->get();
+    	if (count($data) > 0) {
+            foreach ($data as $key => $value) {
+                $value['foto'] = URL::to('/').''.Storage::url($value->foto);
+            }
+            return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+        } else {
+            return response()->json(['status' => 404, 'message' => 'not found!', 'data' => null]);
+        }
     }
 
     public function show($id)
@@ -160,5 +144,40 @@ class PenggunaController extends Controller
         $user = Auth::user();
         $user['foto'] = URL::to('/').''.Storage::url($user['foto']);
         return response()->json(['status' => 200, 'message' => 'success', 'user' => $user, 'level' => Auth::user()->level['level']]);
+    }
+
+    public function resetVerification(Request $request)
+    {
+        $check = Pengguna::where('email', $request->email)->exists();
+        if ($check) {
+            $code = Str::random(5);
+            $data = Pengguna::where('email', $request->email)->update(['kode_verifikasi' => $code]);
+            $mail = Mail::to($request->email)->send(new ResetPassword($request->email, $code));
+            if (count(Mail::failures()) > 0) {
+                return response()->json(['status' => 400, 'message' => 'bad request!', 'data' => false]);
+            } else {
+                return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
+            }
+        } else {
+            return response()->json(['status' => 404, 'message' => 'not found!', 'data' => false]);
+        }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $data = Pengguna::where('email', $request->email)
+            ->where('kode_verifikasi', $request->code)
+            ->first();
+        if ($data) {
+            $password = Hash::make($request->password);
+            $reset = Pengguna::where('id', $data->id)->update(['password' => $password]);
+            if ($reset == 1) {
+                return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
+            } else {
+                return response()->json(['status' => 400, 'message' => 'bad request!', 'data' => false]);
+            }
+        } else {
+            return response()->json(['status' => 400, 'message' => 'bad request!', 'data' => false]);
+        }
     }
 }

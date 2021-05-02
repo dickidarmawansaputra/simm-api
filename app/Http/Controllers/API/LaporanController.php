@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Exports\InventarisExport;
+use App\Exports\InventarisSingleExport;
+use App\Exports\KegiatanExport;
 use App\Exports\KegiatanSingleExport;
+use App\Exports\KegiatansExport;
 use App\Exports\KeuanganExport;
 use App\Exports\KeuanganSingleExport;
 use App\Http\Controllers\Controller;
@@ -40,7 +43,7 @@ class LaporanController extends Controller
         return Datatables::of($model)
             ->addColumn('aksi', function($model) use ($request) {
                 return '
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark"><i class="fa fa-file-excel"></i></a>
+                <a href="'.route('excel.inventaris', [$request->masjid_id, $model->id]).'" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark"><i class="fa fa-file-excel"></i></a>
                 <a href="'.route('pdf.inventaris', [$request->masjid_id, $model->id]).'" target="_blank" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-red2-dark"><i class="fa fa-file-pdf"></i></a>
                 ';
             })
@@ -210,7 +213,7 @@ class LaporanController extends Controller
                 })
                 ->get();
         $pdf = PDF::loadView('laporan.kegiatanpdf', compact('data'))->setPaper('a4', 'portrait')->setWarnings(false);
-        return $pdf->download('Laporan Keuangan.pdf');
+        return $pdf->download('Laporan Kegiatan.pdf');
     }
 
     public function pdfInventarisAll(Request $request, $masjid_id)
@@ -245,6 +248,11 @@ class LaporanController extends Controller
         return Excel::download(new KegiatanSingleExport($masjid_id, $id), 'Laporan Kegiatan.xlsx');
     }
 
+    public function excelInventaris($masjid_id, $id)
+    {
+        return Excel::download(new InventarisSingleExport($masjid_id, $id), 'Laporan Inventaris.xlsx');
+    }
+
     public function excelKeuanganAll(Request $request, $masjid_id)
     {
         $waktu_keuangan = $request->waktu_keuangan;
@@ -256,7 +264,7 @@ class LaporanController extends Controller
     {
         $waktu_kegiatan = $request->waktu_kegiatan;
         $jenis_kegiatan = $request->jenis_kegiatan;
-        return Excel::download(new KeuanganExport($masjid_id, $waktu_kegiatan, $jenis_kegiatan), 'Laporan Kegiatan.xlsx');
+        return Excel::download(new KegiatanExport($masjid_id, $waktu_kegiatan, $jenis_kegiatan), 'Laporan Kegiatan.xlsx');
     }
 
     public function excelInventarisAll(Request $request, $masjid_id)

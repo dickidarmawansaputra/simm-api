@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Keuangan;
 use App\Models\SaldoKeuangan;
-use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,7 +15,6 @@ class KeuanganController extends Controller
         $data = $request->all();
         $validator = Validator::make($data, [
          'jenis_keuangan' => 'required',
-         'sumber' => 'required',
          'jumlah' => 'required',
          'keterangan' => 'required',
          'tanggal' => 'required',
@@ -47,22 +45,12 @@ class KeuanganController extends Controller
 
     public function data(Request $request)
     {
-        $model = Keuangan::where(function($query) use ($request) {
-                    if ($request->level == 'operator') {
-                        $query->where('masjid_id', $request->masjid_id);
-                    }
-                });
-        return Datatables::of($model)
-            ->addColumn('aksi', function($model) {
-                return '
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-green2-dark" onclick="lihatData('.$model->id.')"><i class="fa fa-eye"></i></a>
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-blue2-dark" onclick="editData('.$model->id.')"><i class="fa fa-edit"></i></a>
-                <a href="#" class="btn btn-xxs mb-3 rounded-xs text-uppercase font-900 shadow-s bg-red2-dark" onclick="hapusData('.$model->id.')"><i class="fa fa-trash"></i></a>
-                ';
-            })
-            ->addIndexColumn()
-            ->rawColumns(['aksi'])
-            ->make(true);
+        $data = Keuangan::where('masjid_id', $request->masjid_id)->get();
+        if (count($data) > 0) {
+            return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
+        } else {
+            return response()->json(['status' => 404, 'message' => 'not found!', 'data' => null]);
+        }
     }
 
     public function show($id)
@@ -77,7 +65,6 @@ class KeuanganController extends Controller
         $validator = Validsator::make($data, [
          'id' => 'required',
          'jenis_keuangan' => 'required',
-         'sumber' => 'required',
          'jumlah' => 'required',
          'keterangan' => 'required',
          'tanggal' => 'required',

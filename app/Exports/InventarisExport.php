@@ -22,7 +22,7 @@ class InventarisExport implements FromView, ShouldAutoSize
     {
         $nama_inventaris = $this->nama_inventaris;
         $kondisi_inventaris = $this->kondisi_inventaris;
-        return view('laporan.kegiatanexcel', [
+        return view('laporan.inventarisexcel', [
             'data' => Inventaris::where('masjid_id', $this->masjid_id)
                         ->where(function($query) use ($nama_inventaris) {
                             if ($nama_inventaris) {

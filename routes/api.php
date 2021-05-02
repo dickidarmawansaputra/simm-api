@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+Route::post('email/send', 'MailController@send');
 Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 	Route::group(['prefix' => 'data', 'namespace' => 'Frontend'], function () {
 		Route::get('masjid/show/{id}', 'MasjidController@show');
@@ -41,6 +41,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 		Route::get('keuangan/excel/{masjid}', 'KeuanganController@excel');
 	});
 	Route::post('login', 'PenggunaController@login');
+	Route::post('reset/verification', 'PenggunaController@resetVerification');
+	Route::post('reset/password', 'PenggunaController@resetPassword');
 	Route::group(['middleware' => 'auth:api'], function () {
 		Route::post('logout', 'PenggunaController@logout');
 		Route::post('fasilitas/store', 'FasilitasController@store');
@@ -101,4 +103,5 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 	Route::post('laporan/kegiatan/excel/{masjid}', 'LaporanController@excelKegiatanAll');
 	Route::get('laporan/keuangan/excel/{masjid}/{id}', 'LaporanController@excelKeuangan')->name('excel.keuangan');
 	Route::get('laporan/kegiatan/excel/{masjid}/{id}', 'LaporanController@excelKegiatan')->name('excel.kegiatan');
+	Route::get('laporan/inventaris/excel/{masjid}/{id}', 'LaporanController@excelInventaris')->name('excel.inventaris');
 });
