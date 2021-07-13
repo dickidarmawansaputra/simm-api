@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Inventaris;
+use App\Models\Masjid;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -22,7 +23,8 @@ class InventarisExport implements FromView, ShouldAutoSize
     {
         $nama_inventaris = $this->nama_inventaris;
         $kondisi_inventaris = $this->kondisi_inventaris;
-        return view('laporan.inventarisexcel', [
+        $masjid = Masjid::where('id', $this->masjid_id)->first();
+        return view('laporan.inventarisexcel', ['masjid' => $masjid, 
             'data' => Inventaris::where('masjid_id', $this->masjid_id)
                         ->where(function($query) use ($nama_inventaris) {
                             if ($nama_inventaris) {

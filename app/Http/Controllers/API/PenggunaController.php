@@ -15,9 +15,17 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 
 class PenggunaController extends Controller
 {
+    public function chartPengguna(Request $request)
+    {
+        $admin = Level::where('level', 'admin')->count();
+        $operator = Level::where('level', 'operator')->count();
+        return response()->json(['status' => 200, 'message' => 'success', 'admin' => $admin, 'operator' => $operator]);
+    }
+
     public function store(Request $request)
     {
 	  	$data = $request->all();
@@ -52,9 +60,21 @@ class PenggunaController extends Controller
 	  	return response()->json(['status' => 200, 'message' => 'success', 'data' => $result]);
     }
 
-    public function data()
+    public function data(Request $request)
     {
-    	$data = Pengguna::with('level')->get();
+    	$data = Pengguna::with('level')
+        ->with('masjid')
+        ->where(function ($query) use ($request) {
+            if ($request->nama) {
+                $query->where('nama', 'LIKE', '%'.$request->nama.'%');
+            }
+        })
+        ->where(function ($query) use ($request) {
+            if ($request->masjid) {
+                $query->where('masjid_id', $request->masjid);
+            }
+        })
+        ->get();
     	if (count($data) > 0) {
             foreach ($data as $key => $value) {
                 $value['foto'] = URL::to('/').''.Storage::url($value->foto);
@@ -78,7 +98,6 @@ class PenggunaController extends Controller
     	$validator = Validator::make($data, [
     	 'id' => 'required',
     	 'nama' => 'required',
-    	 'level' => 'required',
     	]);
 
     	if ($validator->fails()) {
@@ -103,9 +122,11 @@ class PenggunaController extends Controller
             unset($data['password']);
         }
         $result = Pengguna::find($request->id)->update($data);
-        $level = Level::where('pengguna_id', $request->id)->update([
-					'level' => $request->level
-				]);
+        if ($request->level) {
+            $level = Level::where('pengguna_id', $request->id)->update([
+    					'level' => $request->level
+    				]);
+        }
 		if ($result == 1) {
 			return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);
 		} else {

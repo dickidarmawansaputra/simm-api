@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Laporan Inventaris</title>
+	<title>Laporan Inventaris Masjid {{ ucwords($masjid->nama_masjid) }}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<style>
 	.page-break {
@@ -17,18 +17,10 @@
 	</style>
 </head>
 <body>
-	{{-- <table cellpadding="0" cellspacing="0">
-		<tr>
-			<td width="30%">
-				<img src="{{ asset('logo.png') }}" width="200">
-			</td>
-			<td width="70%">
-				<h3 style="margin-left: -250px; text-align: center;">
-					Rincian Faktur Barang Masuk
-				</h3>
-			</td>
-		</tr>
-	</table> --}}
+	<h2 style="text-align: center;">Laporan Inventaris Masjid {{ ucwords($masjid->nama_masjid) }}</h2>
+	{{-- @if($tahun != null)
+	<h2 style="text-align: center;">Tahun {{ $tahun }}</h2>
+	@endif --}}
 	<hr>
 	<div class="format">
 		@if(count($data) > 0)
@@ -52,6 +44,11 @@
 				@endforeach
 			</tbody>
 		</table>
+		<br><br><br>
+		<p style="margin-left: 420px; margin-right: -100px;">{{ ucwords(strtolower($masjid['kelurahan'])) }},<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>{{ date('Y') }}</p>
+		<p style="margin-left: 420px; margin-right: -100px;">Bendahara,</p>
+		<br><br><br><br><br><br>
+		<p style="margin-left: 420px; margin-right: -100px;"><u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></p>
 		@else
 		<h1>Data tidak ditemukan!</h1>
 		@endif

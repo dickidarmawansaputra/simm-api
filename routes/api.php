@@ -17,17 +17,17 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 	Route::group(['prefix' => 'data', 'namespace' => 'Frontend'], function () {
 		Route::get('masjid/show/{id}', 'MasjidController@show');
 		Route::get('masjid/showall', 'MasjidController@showAll');
-		Route::get('masjid/showall/detail', 'MasjidController@showAllDetail');
+		Route::post('masjid/showall/detail', 'MasjidController@showAllDetail');
 		Route::get('kegiatan/show/{masjid}/{id}', 'KegiatanController@show');
 		Route::get('kegiatan/showall/{masjid}', 'KegiatanController@showAll');
 		Route::get('kegiatan/showall/limit/{masjid}', 'KegiatanController@showAllLimit');
 		Route::get('kegiatan/data', 'KegiatanController@data');
-		Route::get('kegiatan/dataall', 'KegiatanController@dataAll');
+		Route::post('kegiatan/dataall', 'KegiatanController@dataAll');
 		Route::get('fasilitas/show/{masjid}/{id}', 'FasilitasController@show');
 		Route::get('fasilitas/showall/{masjid}', 'FasilitasController@showAll');
 		Route::get('fasilitas/showall/limit/{masjid}', 'FasilitasController@showAllLimit');
 		Route::get('fasilitas/data', 'FasilitasController@data');
-		Route::get('fasilitas/dataall', 'FasilitasController@dataAll');
+		Route::post('fasilitas/dataall', 'FasilitasController@dataAll');
 		Route::get('kepengurusan/show/{masjid}/{id}', 'KepengurusanController@show');
 		Route::get('kepengurusan/showall/{masjid}', 'KepengurusanController@showAll');
 		Route::get('kepengurusan/showall/limit/{masjid}', 'KepengurusanController@showAllLimit');
@@ -44,6 +44,8 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 	Route::post('reset/verification', 'PenggunaController@resetVerification');
 	Route::post('reset/password', 'PenggunaController@resetPassword');
 	Route::group(['middleware' => 'auth:api'], function () {
+		Route::get('pengguna/chart', 'PenggunaController@chartPengguna');
+		
 		Route::post('logout', 'PenggunaController@logout');
 		Route::post('fasilitas/store', 'FasilitasController@store');
 		Route::post('fasilitas/data', 'FasilitasController@data');
@@ -51,12 +53,14 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 		Route::post('fasilitas/update', 'FasilitasController@update');
 		Route::delete('fasilitas/destroy/{id}', 'FasilitasController@destroy');
 
+		Route::post('inventaris/dashboard', 'InventarisController@dashboard');
 		Route::post('inventaris/store', 'InventarisController@store');
 		Route::post('inventaris/data', 'InventarisController@data');
 		Route::get('inventaris/show/{id}', 'InventarisController@show');
 		Route::post('inventaris/update', 'InventarisController@update');
 		Route::delete('inventaris/destroy/{id}', 'InventarisController@destroy');
 
+		Route::post('kegiatan/dashboard', 'KegiatanController@dashboard');
 		Route::post('kegiatan/store', 'KegiatanController@store');
 		Route::post('kegiatan/data', 'KegiatanController@data');
 		Route::get('kegiatan/show/{id}', 'KegiatanController@show');
@@ -76,13 +80,13 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 		Route::delete('keuangan/destroy/{id}', 'KeuanganController@destroy');
 
 		Route::post('masjid/store', 'MasjidController@store');
-		Route::get('masjid/data', 'MasjidController@data');
+		Route::post('masjid/data', 'MasjidController@data');
 		Route::get('masjid/show/{id}', 'MasjidController@show');
 		Route::post('masjid/update', 'MasjidController@update');
 		Route::delete('masjid/destroy/{id}', 'MasjidController@destroy');
 
 		Route::post('pengguna/store', 'PenggunaController@store');
-		Route::get('pengguna/data', 'PenggunaController@data');
+		Route::post('pengguna/data', 'PenggunaController@data');
 		Route::get('pengguna/show/{id}', 'PenggunaController@show');
 		Route::post('pengguna/update', 'PenggunaController@update');
 		Route::delete('pengguna/destroy/{id}', 'PenggunaController@destroy');
@@ -95,6 +99,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'API'], function () {
 	Route::get('laporan/keuangan/pdf/{masjid}/{id}', 'LaporanController@pdfKeuangan')->name('pdf.keuangan');
 	Route::get('laporan/kegiatan/pdf/{masjid}/{id}', 'LaporanController@pdfKegiatan')->name('pdf.kegiatan');
 	Route::get('laporan/inventaris/pdf/{masjid}/{id}', 'LaporanController@pdfInventaris')->name('pdf.inventaris');
+	Route::post('laporan/keuangan/chart', 'LaporanController@chartKeuangan');
+	Route::post('laporan/inventaris/chart', 'LaporanController@chartInventaris');
+	Route::post('laporan/kegiatan/chart', 'LaporanController@chartKegiatan');
 	Route::post('laporan/keuangan/pdf/{masjid}', 'LaporanController@pdfKeuanganAll');
 	Route::post('laporan/kegiatan/pdf/{masjid}', 'LaporanController@pdfKegiatanAll');
 	Route::post('laporan/inventaris/pdf/{masjid}', 'LaporanController@pdfInventarisAll');

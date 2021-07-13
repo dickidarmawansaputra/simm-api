@@ -47,10 +47,23 @@ class MasjidController extends Controller
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $result]);
     }
 
-    public function data()
+    public function data(Request $request)
     {
-        $data = Masjid::all();
+        $data = Masjid::where(function ($query) use ($request) {
+            if ($request->kecamatan) {
+                $query->where('kecamatan', $request->kecamatan);
+            }
+        })
+        ->where(function ($query) use ($request) {
+            if ($request->tipologi_masjid) {
+                $query->where('tipologi_masjid', $request->tipologi_masjid);
+            }
+        })
+        ->get();
         if (count($data) > 0) {
+            foreach ($data as $key => $value) {
+                $value['gambar'] = URL::to('/').''.Storage::url($value->gambar);
+            }
             return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
         } else {
             return response()->json(['status' => 404, 'message' => 'not found!', 'data' => null]);

@@ -21,8 +21,13 @@ class KeuanganExport implements FromView, ShouldAutoSize
     public function view(): View
     {
         $waktu_keuangan = $this->waktu_keuangan;
+        if ($waktu_keuangan) {
+            $tahun = explode("-", $waktu_keuangan)[0];
+        } else {
+            $tahun = null;
+        }
         $jenis_keuangan = $this->jenis_keuangan;
-        return view('laporan.keuanganexcel', [
+        return view('laporan.keuanganexcel', ['tahun' => $tahun, 
             'keuangan' => SaldoKeuangan::with(['history' => function ($query) use ($jenis_keuangan, $waktu_keuangan) {
                                 $query->where(function($query) use ($jenis_keuangan) {
                                     if ($jenis_keuangan) {

@@ -25,4 +25,9 @@ class Keuangan extends Model
     {
         return $this->hasOne('App\Models\SaldoKeuangan', 'masjid_id', 'masjid_id');
     }
+
+    public function history()
+    {
+        return $this->hasMany('App\Models\Keuangan', 'jenis_keuangan', 'jenis_keuangan')->orderBy('tanggal', 'desc');
+    }
 }

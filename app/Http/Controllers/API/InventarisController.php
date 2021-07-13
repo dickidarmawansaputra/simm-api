@@ -11,6 +11,20 @@ use Illuminate\Support\Facades\Validator;
 
 class InventarisController extends Controller
 {
+    public function dashboard(Request $request)
+    {
+        $baik = Inventaris::where('masjid_id', $request->masjid_id)
+            ->where('kondisi_inventaris', 'Baik')
+            ->count();
+        $sedang = Inventaris::where('masjid_id', $request->masjid_id)
+            ->where('kondisi_inventaris', 'Sedang')
+            ->count();
+        $buruk = Inventaris::where('masjid_id', $request->masjid_id)
+            ->where('kondisi_inventaris', 'Buruk')
+            ->count();
+        return response()->json(['status' => 200, 'message' => 'success', 'baik' => $baik, 'sedang' => $sedang, 'buruk' => $buruk]);
+    }
+
     public function store(Request $request)
     {
         $data = $request->all();
@@ -44,7 +58,18 @@ class InventarisController extends Controller
 
     public function data(Request $request)
     {
-        $data = Inventaris::where('masjid_id', $request->masjid_id)->get();
+        $data = Inventaris::where('masjid_id', $request->masjid_id)
+        ->where(function ($query) use ($request) {
+            if ($request->nama_inventaris) {
+                $query->where('nama_inventaris', 'LIKE', '%'.$request->nama_inventaris.'%');
+            }
+        })
+        ->where(function ($query) use ($request) {
+            if ($request->kondisi_inventaris) {
+                $query->where('kondisi_inventaris', $request->kondisi_inventaris);
+            }
+        })
+        ->get();
         if (count($data) > 0) {
             foreach ($data as $key => $value) {
                 $value['foto_inventaris'] = URL::to('/').''.Storage::url($value->foto_inventaris);

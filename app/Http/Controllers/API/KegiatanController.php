@@ -12,6 +12,20 @@ use Illuminate\Support\Facades\Validator;
 
 class KegiatanController extends Controller
 {
+    public function dashboard(Request $request)
+    {
+        $kajian = Kegiatan::where('masjid_id', $request->masjid_id)
+            ->where('jenis_kegiatan', 'Kajian')
+            ->count();
+        $sosial = Kegiatan::where('masjid_id', $request->masjid_id)
+            ->where('jenis_kegiatan', 'Sosial')
+            ->count();
+        $lainnya = Kegiatan::where('masjid_id', $request->masjid_id)
+            ->where('jenis_kegiatan', 'Lainnya')
+            ->count();
+        return response()->json(['status' => 200, 'message' => 'success', 'kajian' => $kajian, 'sosial' => $sosial, 'lainnya' => $lainnya]);
+    }
+
     public function store(Request $request)
     {
         $data = $request->all();
@@ -20,7 +34,8 @@ class KegiatanController extends Controller
          'deskripsi_kegiatan' => 'required',
          'jenis_kegiatan' => 'required',
          'foto_kegiatan' => 'required',
-         'tanggal_waktu_kegiatan' => 'required',
+         'tanggal_kegiatan' => 'required',
+         'waktu_kegiatan' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -37,14 +52,28 @@ class KegiatanController extends Controller
             $data['foto_kegiatan'] = $path;
         }
 
-        $data['tanggal_waktu_kegiatan'] = Carbon::parse($request->tanggal_waktu_kegiatan)->format('Y-m-d H:i:s');
+        $tanggal = Carbon::parse($request->tanggal_kegiatan)->format('Y-m-d');
+        $waktu = Carbon::parse($request->waktu_kegiatan)->format('H:i:s');
+
+        $data['tanggal_waktu_kegiatan'] = $tanggal.' '.$waktu;
 	  	$result = Kegiatan::create($data);
 	  	return response()->json(['status' => 200, 'message' => 'success', 'data' => $result]);
     }
 
     public function data(Request $request)
     {
-        $data = Kegiatan::where('masjid_id', $request->masjid_id)->get();
+        $data = Kegiatan::where('masjid_id', $request->masjid_id)
+        ->where(function ($query) use ($request) {
+            if ($request->jenis_kegiatan) {
+                $query->where('jenis_kegiatan', $request->jenis_kegiatan);
+            }
+        })
+        ->where(function ($query) use ($request) {
+            if ($request->nama_kegiatan) {
+                $query->where('nama_kegiatan', 'LIKE', '%'.$request->nama_kegiatan.'%');
+            }
+        })
+        ->get();
         if (count($data) > 0) {
             foreach ($data as $key => $value) {
                 $value['foto_kegiatan'] = URL::to('/').''.Storage::url($value->foto_kegiatan);
@@ -70,8 +99,8 @@ class KegiatanController extends Controller
          'nama_kegiatan' => 'required',
          'deskripsi_kegiatan' => 'required',
          'jenis_kegiatan' => 'required',
-         'tanggal_waktu_kegiatan' => 'required',
-         'pemateri' => 'required',
+         'tanggal_kegiatan' => 'required',
+         'waktu_kegiatan' => 'required',
          'masjid_id' => 'required',
          'pengguna_id' => 'required',
         ]);
@@ -91,9 +120,12 @@ class KegiatanController extends Controller
         } else {
             unset($data['foto_kegiatan']);
         }
-        
-        $data['tanggal_waktu_kegiatan'] = Carbon::parse($request->tanggal_waktu_kegiatan)->format('Y-m-d H:i:s');
 
+        $tanggal = Carbon::parse($request->tanggal_kegiatan)->format('Y-m-d');
+        $waktu = Carbon::parse($request->waktu_kegiatan)->format('H:i:s');
+
+        $data['tanggal_waktu_kegiatan'] = $tanggal.' '.$waktu;
+        
 	  	$result = Kegiatan::find($request->id)->update($data);
         if ($result == 1) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => true]);

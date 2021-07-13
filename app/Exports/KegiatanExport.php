@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Kegiatan;
+use App\Models\Masjid;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -21,8 +22,14 @@ class KegiatanExport implements FromView, ShouldAutoSize
     public function view(): View
     {
         $waktu_kegiatan = $this->waktu_kegiatan;
+        if ($waktu_kegiatan) {
+            $tahun = explode("-", $waktu_kegiatan)[0];
+        } else {
+            $tahun = null;
+        }
         $jenis_kegiatan = $this->jenis_kegiatan;
-        return view('laporan.kegiatanexcel', [
+        $masjid = Masjid::where('id', $this->masjid_id)->first();
+        return view('laporan.kegiatanexcel', ['tahun' => $tahun, 'masjid' => $masjid, 
             'data' => Kegiatan::where('masjid_id', $this->masjid_id)
                         ->where(function($query) use ($waktu_kegiatan) {
                             if ($waktu_kegiatan) {

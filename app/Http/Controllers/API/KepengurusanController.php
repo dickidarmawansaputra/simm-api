@@ -37,7 +37,18 @@ class KepengurusanController extends Controller
 
     public function data(Request $request)
     {
-        $data = Kepengurusan::where('masjid_id', $request->masjid_id)->get();
+        $data = Kepengurusan::where('masjid_id', $request->masjid_id)
+        ->where(function ($query) use ($request) {
+            if ($request->nama) {
+                $query->where('nama', 'LIKE', '%'.$request->nama.'%');
+            }
+        })
+        ->where(function ($query) use ($request) {
+            if ($request->jenis_kelamin) {
+                $query->where('jenis_kelamin', $request->jenis_kelamin);
+            }
+        })
+        ->get();
         if (count($data) > 0) {
             return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
         } else {

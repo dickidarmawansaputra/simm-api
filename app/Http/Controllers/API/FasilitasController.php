@@ -43,7 +43,18 @@ class FasilitasController extends Controller
 
     public function data(Request $request)
     {
-        $data = Fasilitas::where('masjid_id', $request->masjid_id)->get();
+        $data = Fasilitas::where('masjid_id', $request->masjid_id)
+        ->where(function($query) use ($request) {
+            if ($request->kondisi_fasilitas) {
+                $query->where('kondisi_fasilitas', $request->kondisi_fasilitas);
+            }
+        })
+        ->where(function($query) use ($request) {
+            if ($request->nama_fasilitas) {
+                $query->where('nama_fasilitas', 'LIKE', '%'.$request->nama_fasilitas.'%');
+            }
+        })
+        ->get();
         if (count($data) > 0) {
             foreach ($data as $key => $value) {
                 $value['foto_fasilitas'] = URL::to('/').''.Storage::url($value->foto_fasilitas);

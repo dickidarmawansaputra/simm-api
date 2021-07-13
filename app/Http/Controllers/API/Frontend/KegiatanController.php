@@ -64,9 +64,20 @@ class KegiatanController extends Controller
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
-    public function dataAll()
+    public function dataAll(Request $request)
     {
         $data = Kegiatan::leftJoin('masjid', 'kegiatan.masjid_id', 'masjid.id')
+            ->where(function ($query) use ($request) {
+                if ($request->nama_kegiatan) {
+                    $query->where('nama_kegiatan', 'LIKE', '%'.$request->nama_kegiatan.'%');
+                }
+            })
+            ->where(function ($query) use ($request) {
+                if ($request->jenis_kegiatan) {
+                    $query->where('jenis_kegiatan', $request->jenis_kegiatan);
+                }
+            })
+            ->whereNull('masjid.deleted_at')
             ->select('kegiatan.id', 'kegiatan.nama_kegiatan', 'kegiatan.deskripsi_kegiatan', 'kegiatan.jenis_kegiatan', 'kegiatan.foto_kegiatan', 'kegiatan.tanggal_waktu_kegiatan', 'masjid.nama_masjid', 'masjid.alamat_masjid', 'masjid_id')
             ->orderBy('kegiatan.id', 'DESC')
             ->get();

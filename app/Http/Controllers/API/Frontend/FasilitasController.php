@@ -61,9 +61,20 @@ class FasilitasController extends Controller
         return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
-    public function dataAll()
+    public function dataAll(Request $request)
     {
         $data = Fasilitas::leftJoin('masjid', 'fasilitas.masjid_id', 'masjid.id')
+            ->where(function ($query) use ($request) {
+                if ($request->nama_fasilitas) {
+                    $query->where('nama_fasilitas', 'LIKE', '%'.$request->nama_fasilitas.'%');
+                }
+            })
+            ->where(function ($query) use ($request) {
+                if ($request->kondisi_fasilitas) {
+                    $query->where('kondisi_fasilitas', $request->kondisi_fasilitas);
+                }
+            })
+            ->whereNull('masjid.deleted_at')
             ->select('fasilitas.id', 'nama_fasilitas', 'deskripsi_fasilitas', 'foto_fasilitas', 'kondisi_fasilitas', 'masjid_id', 'masjid.nama_masjid')
             ->get();
         foreach ($data as $key => $value) {

@@ -27,9 +27,19 @@ class MasjidController extends Controller
     	return response()->json(['status' => 200, 'message' => 'success', 'data' => $data]);
     }
 
-    public function showAllDetail()
+    public function showAllDetail(Request $request)
     {
-        $data = Masjid::all();
+        $data = Masjid::where(function ($query) use ($request) {
+            if ($request->nama_masjid) {
+                $query->where('nama_masjid', 'LIKE', '%'.$request->nama_masjid.'%');
+            }
+        })
+        ->where(function ($query) use ($request) {
+            if ($request->kecamatan) {
+                $query->where('kecamatan', $request->kecamatan);
+            }
+        })
+        ->get();
         foreach ($data as $key => $value) {
             $gambar = URL::to('/').''.Storage::url($value['gambar']);
             $value['gambar'] = $gambar;
